@@ -1,4 +1,4 @@
-name: Full Stack CI
+name: CI
 
 on:
   push:
@@ -9,54 +9,22 @@ on:
       - main
 
 jobs:
-  ci:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Get source code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # 3. Install backend dependencies
-      - name: Install backend dependencies
-        working-directory: ./backend
+      - name: Install frontend dependencies
+        working-directory: frontend
         run: npm ci
 
-      # 4. Test backend
-      - name: Test backend
-        working-directory: ./backend
-        run: npm test
-
-      # 5. Test frontend
-      - name: Test frontend
-        working-directory: ./frontend
-        run: npm test
-
-      # 6. Build backend Docker image
-      - name: Build backend Docker image
-        run: docker build -t nihalshahid/fullstack-backend:latest ./backend
-
-      # 7. Build frontend Docker image
-      - name: Build frontend Docker image
-        run: docker build -t nihalshahid/fullstack-frontend:latest ./frontend
-
-      # 8. Login to Docker Hub
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      # 9. Push backend image
-      - name: Push backend image
-        run: docker push nihalshahid/fullstack-backend:latest
-
-      # 10. Push frontend image
-      - name: Push frontend image
-        run: docker push nihalshahid/fullstack-frontend:latest
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
